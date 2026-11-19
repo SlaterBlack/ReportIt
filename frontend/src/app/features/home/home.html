@@ -1,0 +1,17 @@
+<main class="home-page">
+  <header class="page-title-row">
+    <div>
+      <p class="eyebrow">Reporting workspace</p>
+      <h1>Welcome back, {{ currentUser()?.name || "there" }}</h1>
+      <p class="subtitle">Your team's reports and insights will live here.</p>
+    </div>
+  </header>
+
+  <section class="home-card card" aria-labelledby="workspace-title">
+    <span class="home-mark" aria-hidden="true">R</span>
+    <div>
+      <h2 id="workspace-title">Your reporting workspace</h2>
+      <p>ReportIt is ready. Reporting tools will be added here.</p>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,19 @@
+[Unit]
+Description=ReportIt frontend (static build + API reverse proxy)
+After=network.target storeit-backend.service
+Wants=storeit-backend.service
+
+[Service]
+Type=simple
+User=ai3d
+Group=www-data
+WorkingDirectory=/var/www/ReportIt/frontend
+EnvironmentFile=/var/www/ReportIt/frontend/.env
+ExecStart=/usr/bin/node /var/www/ReportIt/frontend/server.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

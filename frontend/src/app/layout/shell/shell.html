@@ -1,0 +1,110 @@
+<header class="navbar">
+  <div class="service-switcher">
+    <button
+      class="navbar-brand"
+      type="button"
+      aria-haspopup="menu"
+      aria-label="ReportIt, switch service"
+      [attr.aria-expanded]="isServiceMenuOpen()"
+      [attr.aria-controls]="isServiceMenuOpen() ? 'service-menu' : null"
+      (click)="toggleServiceMenu()"
+    >
+      <img src="/ReportIt_32.png" width="24" height="24" alt="" />
+      <span>ReportIt</span>
+      <svg
+        class="service-switcher-chevron"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path d="m4 6 4 4 4-4" />
+      </svg>
+    </button>
+    @if (isServiceMenuOpen()) {
+    <div
+      class="service-menu-panel"
+      id="service-menu"
+      role="menu"
+      aria-label="Switch service"
+    >
+      @if (serviceMenuState() === 'loading') {
+      <p class="service-menu-message" role="status">Checking services…</p>
+      } @else if (serviceMenuState() === 'error') {
+      <div class="service-menu-message" role="alert">
+        <p>Could not load services.</p>
+        <button type="button" role="menuitem" (click)="retryServiceLoad()">
+          Try again
+        </button>
+      </div>
+      } @else if (availableServices().length === 0) {
+      <p class="service-menu-message">
+        No other services are currently running.
+      </p>
+      } @else { @for (service of availableServices(); track service.id) {
+      <a
+        class="service-menu-item"
+        role="menuitem"
+        [href]="service.url"
+        (click)="closeServiceMenu()"
+      >
+        <img [src]="service.logoUrl" alt="" width="24" height="24" />
+        <span>{{ service.name }}</span>
+      </a>
+      } }
+    </div>
+    }
+  </div>
+
+  <nav class="navbar-links" aria-label="Main navigation">
+    <a
+      routerLink="/templates"
+      routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      >Report templates</a
+    >
+    <a routerLink="/reports" routerLinkActive="is-active">My reports</a>
+  </nav>
+
+  <div class="navbar-user">
+    <div class="account-menu">
+      <button
+        class="account-menu-trigger"
+        type="button"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="isAccountMenuOpen()"
+        (click)="toggleAccountMenu()"
+      >
+        <span class="account-menu-name">
+          {{ auth.currentUser()?.name || "Account" }}
+        </span>
+        <span class="account-menu-chevron" aria-hidden="true">⌄</span>
+      </button>
+      @if (isAccountMenuOpen()) {
+      <div class="account-menu-panel" role="menu">
+        <a routerLink="/profile" role="menuitem" (click)="closeAccountMenu()"
+          >My account</a
+        >
+        @if (auth.isAdmin()) {
+        <a routerLink="/users" role="menuitem" (click)="closeAccountMenu()"
+          >User accounts</a
+        >
+        }
+        <button type="button" role="menuitem" (click)="openAppearance()">
+          Appearance
+        </button>
+        <button type="button" role="menuitem" (click)="logout()">
+          Log out
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>
+
+@if (isAppearanceOpen()) {
+<app-appearance-dialog (close)="closeAppearance()" />
+}

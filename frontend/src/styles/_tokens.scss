@@ -1,0 +1,85 @@
+:root {
+  // Burgundy and cream brand palette.
+  --color-bg: #faf4e9;
+  --color-surface: #fffcf5;
+  --color-primary: #800020;
+  --color-primary-dark: #520015;
+  --color-primary-light: color-mix(
+    in srgb,
+    var(--color-secondary) 22%,
+    var(--color-surface)
+  );
+  --color-secondary: #d8b8bd;
+  --color-accent: #800020;
+  --color-accent-light: #f3e1e5;
+  --color-contrast: #fffcf5;
+
+  // Status colors retain their meaning regardless of the brand palette.
+  --color-danger: #b4232c;
+  --color-danger-light: #fff2ef;
+  --color-success: #26734d;
+  --color-success-light: #e9f3eb;
+  --color-warning: #8a5b00;
+  --color-warning-light: #f8ead9;
+  --color-info: #2c6491;
+  --color-info-light: #eaf0f4;
+
+  --color-border: color-mix(
+    in srgb,
+    var(--color-secondary) 65%,
+    var(--color-surface)
+  );
+  --color-text: #38252a;
+  --color-text-muted: #68545a;
+  --navbar-account-bg: #fffcf5;
+  --navbar-account-border: #d8b8bd;
+  --navbar-account-text: #38252a;
+  --navbar-account-hover: #faf4e9;
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+
+  --font-family-base: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-size-base: 14px;
+  --radius-sm: 7px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgb(65 0 16 / 6%);
+  --shadow-md: 0 4px 12px rgb(65 0 16 / 8%);
+}
+
+html[data-theme="retro"] {
+  --font-family-base: "VT323", monospace;
+  --color-bg: #170d11;
+  --color-surface: #29151d;
+  --color-primary: #f1a3b2;
+  --color-primary-dark: #f7d8df;
+  --color-primary-light: #451e2a;
+  --color-secondary: #a25b6f;
+  --color-accent: #e07890;
+  --color-accent-light: #4b202e;
+  --color-contrast: #200e14;
+  --color-success: #a2ed84;
+  --color-success-light: #20361a;
+  --color-danger: #ff8989;
+  --color-danger-light: #3c1815;
+  --color-warning: #ffc36b;
+  --color-warning-light: #402b0f;
+  --color-info: #8dcaff;
+  --color-info-light: #132f43;
+  --color-border: #70404e;
+  --color-text: #f5e7eb;
+  --color-text-muted: #d4aab5;
+  --navbar-account-bg: #29151d;
+  --navbar-account-border: #70404e;
+  --navbar-account-text: #f5e7eb;
+  --navbar-account-hover: #451e2a;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --shadow-sm: 2px 2px 0 rgb(0 0 0 / 35%);
+  --shadow-md: 3px 3px 0 rgb(0 0 0 / 40%);
+}

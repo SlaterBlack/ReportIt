@@ -1,0 +1,49 @@
+<main class="login-page" [class.retro]="appearance.theme() === 'retro'">
+  <section class="login-card card" aria-labelledby="login-title">
+    <a class="login-brand" routerLink="/home" aria-label="ReportIt home">
+      <img
+        class="login-logo"
+        src="/ReportIt_64.png"
+        width="48"
+        height="48"
+        alt=""
+      />
+      <span class="brand-name">ReportIt</span>
+    </a>
+    <div class="eyebrow">Your reporting workspace</div>
+    <h1 id="login-title">Sign in</h1>
+    <div class="login-error" *ngIf="errorMessage()" role="alert">
+      {{ errorMessage() }}
+    </div>
+
+    <form (ngSubmit)="submit()">
+      <label class="form-field">
+        Email
+        <input
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          autocomplete="username"
+          required
+        />
+      </label>
+      <label class="form-field">
+        Password
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          autocomplete="current-password"
+          required
+        />
+      </label>
+      <button
+        class="btn btn-primary login-submit"
+        type="submit"
+        [disabled]="isSubmitting()"
+      >
+        {{ isSubmitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+  </section>
+</main>

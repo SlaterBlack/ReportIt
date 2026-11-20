@@ -131,11 +131,21 @@
     = $index) { @switch (element.type) { @case ("paragraph") {
     <section
       class="card editor-section content-element"
-      [attr.aria-label]="'Paragraph ' + (index + 1)"
+      [attr.aria-label]="element.title || 'Paragraph section'"
     >
       <header class="content-element-heading">
-        <h2>Paragraph</h2>
         @if (currentReport.status === "draft") {
+        <label class="form-field paragraph-section-title">
+          Section title
+          <input
+            [ngModel]="element.title"
+            (ngModelChange)="updateParagraphTitle(element.id, $event)"
+            maxlength="200"
+          />
+        </label>
+        } @else {
+        <h2>{{ element.title }}</h2>
+        } @if (currentReport.status === "draft") {
         <div class="element-actions">
           <button
             class="text-button"
@@ -160,22 +170,40 @@
           >
             Remove
           </button>
+          <button
+            class="btn btn-secondary"
+            type="button"
+            (click)="addParagraph(element.id)"
+          >
+            Add paragraph
+          </button>
         </div>
         }
       </header>
-      @if (currentReport.status === "draft") {
-      <label class="form-field">
-        Paragraph text
-        <textarea
-          rows="5"
-          [ngModel]="element.text"
-          (ngModelChange)="updateParagraph(element.id, $event)"
-          maxlength="12000"
-        ></textarea>
-      </label>
+      @for (paragraph of element.paragraphs; track paragraph.id; let
+      paragraphIndex = $index) { @if (currentReport.status === "draft") {
+      <div class="paragraph-entry">
+        <label class="form-field">
+          Paragraph {{ paragraphIndex + 1 }}
+          <textarea
+            rows="5"
+            [ngModel]="paragraph.text"
+            (ngModelChange)="updateParagraphText(element.id, paragraph.id, $event)"
+            maxlength="12000"
+          ></textarea>
+        </label>
+        <button
+          class="text-button danger-text"
+          type="button"
+          [disabled]="element.paragraphs.length <= 1"
+          (click)="removeParagraph(element.id, paragraph.id)"
+        >
+          Remove paragraph
+        </button>
+      </div>
       } @else {
-      <p class="paragraph-content">{{ element.text }}</p>
-      }
+      <p class="paragraph-content">{{ paragraph.text }}</p>
+      } }
     </section>
     } @case ("image") {
     <section
@@ -586,7 +614,10 @@
   @for (element of currentReport.data.elements; track element.id) { @switch
   (element.type) { @case ("paragraph") {
   <section class="print-section print-paragraph" [id]="'entry-' + element.id">
-    <p>{{ element.text }}</p>
+    <h2>{{ element.title }}</h2>
+    @for (paragraph of element.paragraphs; track paragraph.id) {
+    <p>{{ paragraph.text }}</p>
+    }
   </section>
   } @case ("table") {
   <section class="print-section">

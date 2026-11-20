@@ -205,7 +205,11 @@ describe("VqaEditor", () => {
       "table",
       "image",
     ]);
-    expect(elements?.[0]).toMatchObject({ type: "paragraph", text: "" });
+    expect(elements?.[0]).toMatchObject({
+      type: "paragraph",
+      title: "New paragraph section",
+      paragraphs: [{ text: "" }],
+    });
     expect(elements?.[2]).toMatchObject({ type: "image", caption: "" });
 
     component.moveElement(elements![2].id, -1);
@@ -216,13 +220,49 @@ describe("VqaEditor", () => {
       "table",
     ]);
 
-    component.updateParagraph(elements![0].id, "Assessment overview");
+    component.updateParagraphTitle(elements![0].id, "Assessment overview");
+    component.addParagraph(elements![0].id);
+    const paragraphSection = component.report()?.data.elements[0];
+    if (!paragraphSection || paragraphSection.type !== "paragraph")
+      throw new Error("Expected the paragraph section.");
+    component.updateParagraphText(
+      paragraphSection.id,
+      paragraphSection.paragraphs[0].id,
+      "First paragraph.",
+    );
+    component.updateParagraphText(
+      paragraphSection.id,
+      paragraphSection.paragraphs[1].id,
+      "Second paragraph.",
+    );
     component.updateImageCaption(elements![1].id, "North elevation");
     expect(component.report()?.data.elements[0]).toMatchObject({
-      text: "Assessment overview",
+      title: "Assessment overview",
+      paragraphs: [{ text: "First paragraph." }, { text: "Second paragraph." }],
     });
     expect(component.report()?.data.elements[1]).toMatchObject({
       caption: "North elevation",
+    });
+  });
+
+  it("migrates older single-paragraph elements into titled sections", () => {
+    const normalized = normalizeVqaReportData({
+      metadata: {
+        projectOrSite: "Site",
+        assessmentDate: "2026-11-20",
+        assessor: "Architect",
+        summary: "",
+      },
+      elements: [
+        { id: "paragraph-section", type: "paragraph", text: "Existing text" },
+      ],
+    });
+
+    expect(normalized.elements[0]).toMatchObject({
+      id: "paragraph-section",
+      type: "paragraph",
+      title: "Paragraph section",
+      paragraphs: [{ text: "Existing text" }],
     });
   });
 });

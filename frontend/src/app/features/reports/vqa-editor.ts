@@ -125,7 +125,12 @@ export class VqaEditor implements OnInit, OnDestroy {
   }
 
   createParagraph(): void {
-    this.addElement({ id: crypto.randomUUID(), type: "paragraph", text: "" });
+    this.addElement({
+      id: crypto.randomUUID(),
+      type: "paragraph",
+      title: "New paragraph section",
+      paragraphs: [{ id: crypto.randomUUID(), text: "" }],
+    });
   }
 
   createImage(): void {
@@ -159,11 +164,65 @@ export class VqaEditor implements OnInit, OnDestroy {
     });
   }
 
-  updateParagraph(elementId: string, text: string): void {
+  updateParagraphTitle(elementId: string, title: string): void {
     this.updateElements((elements) =>
       elements.map((element) =>
         element.id === elementId && element.type === "paragraph"
-          ? { ...element, text }
+          ? { ...element, title }
+          : element,
+      ),
+    );
+  }
+
+  addParagraph(elementId: string): void {
+    this.updateElements((elements) =>
+      elements.map((element) =>
+        element.id === elementId && element.type === "paragraph"
+          ? {
+              ...element,
+              paragraphs: [
+                ...element.paragraphs,
+                { id: crypto.randomUUID(), text: "" },
+              ],
+            }
+          : element,
+      ),
+    );
+  }
+
+  updateParagraphText(
+    elementId: string,
+    paragraphId: string,
+    text: string,
+  ): void {
+    this.updateElements((elements) =>
+      elements.map((element) =>
+        element.id === elementId && element.type === "paragraph"
+          ? {
+              ...element,
+              paragraphs: element.paragraphs.map((paragraph) =>
+                paragraph.id === paragraphId
+                  ? { ...paragraph, text }
+                  : paragraph,
+              ),
+            }
+          : element,
+      ),
+    );
+  }
+
+  removeParagraph(elementId: string, paragraphId: string): void {
+    this.updateElements((elements) =>
+      elements.map((element) =>
+        element.id === elementId &&
+        element.type === "paragraph" &&
+        element.paragraphs.length > 1
+          ? {
+              ...element,
+              paragraphs: element.paragraphs.filter(
+                (paragraph) => paragraph.id !== paragraphId,
+              ),
+            }
           : element,
       ),
     );

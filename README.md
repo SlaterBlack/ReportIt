@@ -35,7 +35,7 @@ Report templates and PDF-generation code belong in the shared application source
 
 ## VQA reports
 
-The shared VQA template starts with report details and an ordered content area. Authors can progressively add paragraphs, tables, and images from the Add element panel, then reorder or remove them. Each new table starts with two columns and one row; table titles, column names, data types (text, number, date, yes/no, or bounded rating), rows, and columns are editable. Tables can be duplicated. Captioned JPEG, PNG, and WebP images can be added as standalone content or attached to table rows, and appear in a linked image appendix in the print layout. Each image upload is limited to 20 MB. Existing checklist and vision-score reports are converted to editable tables when opened.
+The shared VQA template starts with report details and an ordered content area. Authors can progressively add titled paragraph sections (each containing multiple paragraphs), tables, and images from the Add element panel, then reorder or remove them. Each new table starts with two columns and one row; table titles, column names, data types (text, number, date, yes/no, or bounded rating), rows, and columns are editable. Tables can be duplicated. Captioned JPEG, PNG, and WebP images can be added as standalone content or attached to table rows, and appear in a linked image appendix in the print layout. Each image upload is limited to 20 MB. Existing checklist and vision-score reports are converted to editable tables when opened.
 
 Drafts, completed reports, and image attachments are stored in StoreIt's PostgreSQL database and are scoped to their owner. Before using the report API after deploying StoreIt changes, run the additive schema sync and restart the API:
 

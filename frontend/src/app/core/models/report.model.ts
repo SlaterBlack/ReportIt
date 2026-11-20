@@ -38,7 +38,8 @@ export interface VqaTable {
 export interface VqaParagraphElement {
   id: string;
   type: "paragraph";
-  text: string;
+  title: string;
+  paragraphs: Array<{ id: string; text: string }>;
 }
 
 export interface VqaImageElement {
@@ -90,7 +91,28 @@ export function normalizeVqaReportData(value: unknown): VqaReportData {
     throw new Error("Report data is invalid.");
   }
   if ("elements" in value) {
-    return value as VqaReportData;
+    const data = value as {
+      metadata: VqaReportData["metadata"];
+      elements: Array<
+        | VqaParagraphElement
+        | { id: string; type: "paragraph"; text: string }
+        | VqaTable
+        | VqaImageElement
+      >;
+    };
+    return {
+      ...data,
+      elements: data.elements.map((element) =>
+        element.type === "paragraph" && !("paragraphs" in element)
+          ? {
+              id: element.id,
+              type: "paragraph",
+              title: "Paragraph section",
+              paragraphs: [{ id: crypto.randomUUID(), text: element.text }],
+            }
+          : element,
+      ),
+    };
   }
 
   if ("tables" in value && Array.isArray(value.tables)) {

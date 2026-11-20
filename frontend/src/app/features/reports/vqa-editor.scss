@@ -173,6 +173,19 @@
   }
 }
 
+.paragraph-section-title {
+  width: min(100%, 480px);
+  margin: 0;
+}
+
+.paragraph-entry {
+  margin-top: var(--space-md);
+
+  .form-field {
+    margin-bottom: var(--space-xs);
+  }
+}
+
 .table-heading,
 .table-actions,
 .table-footer {
@@ -472,6 +485,10 @@
   .print-paragraph p {
     margin: 0;
     white-space: pre-wrap;
+  }
+
+  .print-paragraph p + p {
+    margin-top: 0.75rem;
   }
 
   .print-image-element {

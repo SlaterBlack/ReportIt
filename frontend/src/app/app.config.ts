@@ -10,6 +10,7 @@ import { provideRouter, withInMemoryScrolling } from "@angular/router";
 import { provideServiceWorker } from "@angular/service-worker";
 import { authInterceptor } from "./core/interceptors/auth-interceptor";
 import { Appearance } from "./core/services/appearance";
+import { Branding } from "./core/services/branding";
 import { routes } from "./app.routes";
 
 export const appConfig: ApplicationConfig = {
@@ -17,6 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideAppInitializer(() => {
       inject(Appearance);
+      return inject(Branding).load();
     }),
     provideRouter(
       routes,

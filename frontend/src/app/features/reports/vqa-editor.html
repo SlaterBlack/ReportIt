@@ -1,0 +1,653 @@
+@if (isLoading()) {
+<main class="report-editor-page">
+  <p role="status">Loading report…</p>
+</main>
+} @else if (errorMessage() && !report()) {
+<main class="report-editor-page">
+  <p class="error-text" role="alert">{{ errorMessage() }}</p>
+</main>
+} @else if (report(); as currentReport) {
+<main class="report-editor-page editor-screen">
+  <header class="editor-heading">
+    <div>
+      <a routerLink="/reports">My reports</a>
+      <div class="editor-instance-brand">
+        @if (brandingLogo(); as logo) {
+        <img [src]="logo" [alt]="brandingName()" />
+        } @else {
+        <span>{{ brandingName() }}</span>
+        }
+      </div>
+      <p class="eyebrow">Visual Quality Assessment</p>
+      <h1>
+        {{ currentReport.status === "completed" ? "Review report" : "Edit
+        report" }}
+      </h1>
+    </div>
+    <span
+      class="report-status"
+      [class.report-status-completed]="currentReport.status === 'completed'"
+    >
+      {{ currentReport.status === "completed" ? "Completed" : "Draft" }}
+    </span>
+  </header>
+
+  @if (errorMessage()) {
+  <p class="error-text" role="alert">{{ errorMessage() }}</p>
+  } @if (successMessage()) {
+  <p class="success-text" role="status">{{ successMessage() }}</p>
+  } @if (attachmentError()) {
+  <p class="error-text" role="alert">{{ attachmentError() }}</p>
+  }
+
+  <section class="card editor-section" aria-labelledby="report-details-title">
+    <h2 id="report-details-title">Report details</h2>
+    <div class="details-grid">
+      <label class="form-field">
+        Report title
+        <input
+          [ngModel]="currentReport.title"
+          (ngModelChange)="updateTitle($event)"
+          [disabled]="currentReport.status === 'completed'"
+          maxlength="200"
+          required
+        />
+      </label>
+      <label class="form-field">
+        Project or site
+        <input
+          [ngModel]="currentReport.data.metadata.projectOrSite"
+          (ngModelChange)="updateMetadata('projectOrSite', $event)"
+          [disabled]="currentReport.status === 'completed'"
+          maxlength="200"
+        />
+      </label>
+      <label class="form-field">
+        Assessment date
+        <input
+          type="date"
+          [ngModel]="currentReport.data.metadata.assessmentDate"
+          (ngModelChange)="updateMetadata('assessmentDate', $event)"
+          [disabled]="currentReport.status === 'completed'"
+        />
+      </label>
+      <label class="form-field">
+        Assessor
+        <input
+          [ngModel]="currentReport.data.metadata.assessor"
+          (ngModelChange)="updateMetadata('assessor', $event)"
+          [disabled]="currentReport.status === 'completed'"
+          maxlength="120"
+        />
+      </label>
+    </div>
+    <label class="form-field">
+      Summary
+      <textarea
+        rows="4"
+        [ngModel]="currentReport.data.metadata.summary"
+        (ngModelChange)="updateMetadata('summary', $event)"
+        [disabled]="currentReport.status === 'completed'"
+        maxlength="12000"
+      ></textarea>
+    </label>
+  </section>
+
+  @if (currentReport.status === "draft") {
+  <section
+    class="card editor-section add-element-panel"
+    aria-labelledby="add-element-title"
+  >
+    <div>
+      <h2 id="add-element-title">Add element</h2>
+      <p>
+        Build your report in order by adding paragraphs, tables, and images.
+      </p>
+    </div>
+    <div class="add-element-options">
+      <button
+        class="btn btn-secondary"
+        type="button"
+        (click)="createParagraph()"
+      >
+        Add paragraph
+      </button>
+      <button class="btn btn-secondary" type="button" (click)="createTable()">
+        Add table
+      </button>
+      <button class="btn btn-secondary" type="button" (click)="createImage()">
+        Add image
+      </button>
+    </div>
+  </section>
+  }
+
+  <section class="report-content" aria-label="Report content">
+    @if (currentReport.data.elements.length === 0) {
+    <p class="table-empty">
+      Your report is empty. Use “Add element” to get started.
+    </p>
+    } @for (element of currentReport.data.elements; track element.id; let index
+    = $index) { @switch (element.type) { @case ("paragraph") {
+    <section
+      class="card editor-section content-element"
+      [attr.aria-label]="'Paragraph ' + (index + 1)"
+    >
+      <header class="content-element-heading">
+        <h2>Paragraph</h2>
+        @if (currentReport.status === "draft") {
+        <div class="element-actions">
+          <button
+            class="text-button"
+            type="button"
+            [disabled]="index === 0"
+            (click)="moveElement(element.id, -1)"
+          >
+            Move up
+          </button>
+          <button
+            class="text-button"
+            type="button"
+            [disabled]="index === currentReport.data.elements.length - 1"
+            (click)="moveElement(element.id, 1)"
+          >
+            Move down
+          </button>
+          <button
+            class="text-button danger-text"
+            type="button"
+            (click)="removeElement(element)"
+          >
+            Remove
+          </button>
+        </div>
+        }
+      </header>
+      @if (currentReport.status === "draft") {
+      <label class="form-field">
+        Paragraph text
+        <textarea
+          rows="5"
+          [ngModel]="element.text"
+          (ngModelChange)="updateParagraph(element.id, $event)"
+          maxlength="12000"
+        ></textarea>
+      </label>
+      } @else {
+      <p class="paragraph-content">{{ element.text }}</p>
+      }
+    </section>
+    } @case ("image") {
+    <section
+      class="card editor-section content-element image-element"
+      [attr.aria-label]="'Image: ' + element.caption"
+    >
+      <header class="content-element-heading">
+        <h2>Image</h2>
+        @if (currentReport.status === "draft") {
+        <div class="element-actions">
+          <button
+            class="text-button"
+            type="button"
+            [disabled]="index === 0"
+            (click)="moveElement(element.id, -1)"
+          >
+            Move up
+          </button>
+          <button
+            class="text-button"
+            type="button"
+            [disabled]="index === currentReport.data.elements.length - 1"
+            (click)="moveElement(element.id, 1)"
+          >
+            Move down
+          </button>
+          <button
+            class="text-button danger-text"
+            type="button"
+            (click)="removeElement(element)"
+          >
+            Remove
+          </button>
+        </div>
+        }
+      </header>
+      @if (currentReport.status === "draft") {
+      <label class="form-field">
+        Image caption
+        <input
+          [ngModel]="element.caption"
+          (ngModelChange)="updateImageCaption(element.id, $event)"
+          maxlength="300"
+        />
+      </label>
+      @if (attachmentsFor(element.id).length === 0) {
+      <label class="image-upload">
+        <span>Choose an image (JPEG, PNG, or WebP)</span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          [disabled]="isSaving()"
+          (change)="uploadImage(element.id, $event)"
+        />
+      </label>
+      } } @for (image of attachmentsFor(element.id); track image.id) {
+      <figure class="image-element-preview" [id]="'edit-entry-' + element.id">
+        @if (previewFor(image.id); as preview) {
+        <img [src]="preview" [alt]="element.caption || image.caption" />
+        }
+        <figcaption>{{ element.caption || image.caption }}</figcaption>
+        @if (currentReport.status === "draft") {
+        <button
+          type="button"
+          class="text-button danger-text"
+          (click)="removeImage(image)"
+        >
+          Remove uploaded image
+        </button>
+        }
+      </figure>
+      } @if (attachmentsFor(element.id).length === 0 && currentReport.status ===
+      "completed") {
+      <p class="table-empty">No image uploaded.</p>
+      }
+    </section>
+    } @case ("table") {
+    <section
+      class="card editor-section content-element"
+      [attr.aria-label]="element.title || 'Assessment table'"
+    >
+      <header class="table-heading">
+        @if (currentReport.status === "draft") {
+        <label class="form-field table-title-field">
+          Table title
+          <input
+            [ngModel]="element.title"
+            (ngModelChange)="updateTableTitle(element.id, $event)"
+            maxlength="200"
+          />
+        </label>
+        <div class="table-actions">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            (click)="duplicateTable(element.id)"
+          >
+            Duplicate table
+          </button>
+          <button
+            class="text-button danger-text"
+            type="button"
+            (click)="removeElement(element)"
+          >
+            Remove table
+          </button>
+          <button
+            class="text-button"
+            type="button"
+            [disabled]="index === 0"
+            (click)="moveElement(element.id, -1)"
+          >
+            Move up
+          </button>
+          <button
+            class="text-button"
+            type="button"
+            [disabled]="index === currentReport.data.elements.length - 1"
+            (click)="moveElement(element.id, 1)"
+          >
+            Move down
+          </button>
+        </div>
+        } @else {
+        <h2>{{ element.title }}</h2>
+        }
+      </header>
+      <div class="table-scroll">
+        <table class="entry-table">
+          <thead>
+            <tr>
+              @for (column of element.columns; track column.id) {
+              <th scope="col">
+                @if (currentReport.status === "draft") {
+                <div class="column-editor">
+                  <label>
+                    <span class="visually-hidden">Column title</span>
+                    <input
+                      [ngModel]="column.title"
+                      (ngModelChange)="updateColumn(element.id, column.id, { title: $event })"
+                      aria-label="Column title"
+                      maxlength="200"
+                    />
+                  </label>
+                  <label>
+                    <span class="visually-hidden">Column data type</span>
+                    <select
+                      [ngModel]="column.type"
+                      (ngModelChange)="updateColumnType(element.id, column.id, $event)"
+                      aria-label="Column data type"
+                    >
+                      <option value="text">Text</option>
+                      <option value="number">Number</option>
+                      <option value="date">Date</option>
+                      <option value="yesNo">Yes / No</option>
+                      <option value="rating">Rating</option>
+                    </select>
+                  </label>
+                  @if (column.type === "rating") {
+                  <div class="rating-bounds">
+                    <label>
+                      Min
+                      <input
+                        type="number"
+                        min="0"
+                        max="99"
+                        [ngModel]="column.min"
+                        (ngModelChange)="updateRatingBound(element.id, column.id, 'min', $event)"
+                        aria-label="Rating minimum"
+                      />
+                    </label>
+                    <label>
+                      Max
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        [ngModel]="column.max"
+                        (ngModelChange)="updateRatingBound(element.id, column.id, 'max', $event)"
+                        aria-label="Rating maximum"
+                      />
+                    </label>
+                  </div>
+                  }
+                  <button
+                    class="text-button danger-text"
+                    type="button"
+                    [disabled]="element.columns.length <= 1"
+                    (click)="removeColumn(element.id, column.id)"
+                  >
+                    Remove column
+                  </button>
+                </div>
+                } @else {
+                <span>{{ column.title }}</span>
+                }
+              </th>
+              }
+              <th scope="col">Images</th>
+              @if (currentReport.status === "draft") {
+              <th scope="col">
+                <span class="visually-hidden">Row actions</span>
+              </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of element.rows; track row.id) {
+            <tr [id]="'edit-entry-' + row.id">
+              @for (column of element.columns; track column.id) {
+              <td>
+                @if (currentReport.status === "draft") { @switch (column.type) {
+                @case ("text") {
+                <textarea
+                  [ngModel]="cellValue(row, column.id) ?? ''"
+                  (ngModelChange)="updateCell(element.id, row.id, column, $event)"
+                  [attr.aria-label]="column.title || 'Text value'"
+                  rows="2"
+                  maxlength="6000"
+                ></textarea>
+                } @case ("date") {
+                <input
+                  type="date"
+                  [ngModel]="cellValue(row, column.id)"
+                  (ngModelChange)="updateCell(element.id, row.id, column, $event)"
+                  [attr.aria-label]="column.title || 'Date value'"
+                />
+                } @case ("number") {
+                <input
+                  type="number"
+                  step="any"
+                  [ngModel]="cellValue(row, column.id)"
+                  (ngModelChange)="updateCell(element.id, row.id, column, $event)"
+                  [attr.aria-label]="column.title || 'Number value'"
+                />
+                } @case ("yesNo") {
+                <select
+                  [ngModel]="cellValue(row, column.id)"
+                  (ngModelChange)="updateCell(element.id, row.id, column, $event)"
+                  [attr.aria-label]="column.title || 'Yes or no value'"
+                >
+                  <option [ngValue]="null">Select</option>
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                </select>
+                } @case ("rating") {
+                <input
+                  class="rating-input"
+                  type="number"
+                  [min]="column.min ?? 1"
+                  [max]="column.max ?? 5"
+                  step="1"
+                  [ngModel]="cellValue(row, column.id)"
+                  (ngModelChange)="updateCell(element.id, row.id, column, $event)"
+                  [attr.aria-label]="column.title || 'Rating value'"
+                />
+                } } } @else { {{ displayCellValue(cellValue(row, column.id),
+                column) }} }
+              </td>
+              }
+              <td class="entry-images">
+                @for (image of attachmentsFor(row.id); track image.id) {
+                <div class="attached-image">
+                  <span
+                    >Image {{ imageNumber(image.id) }}: {{ image.caption
+                    }}</span
+                  >
+                  @if (currentReport.status === "draft") {
+                  <button
+                    type="button"
+                    class="text-button"
+                    (click)="removeImage(image)"
+                  >
+                    Remove image
+                  </button>
+                  }
+                </div>
+                } @if (currentReport.status === "draft") {
+                <label class="image-upload">
+                  <span>Caption for image</span>
+                  <input
+                    [ngModel]="captionDrafts()[row.id] || ''"
+                    (ngModelChange)="updateCaption(row.id, $event)"
+                    [disabled]="isSaving()"
+                    maxlength="300"
+                  />
+                  <span>Attach image</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    [disabled]="isSaving()"
+                    (change)="uploadImage(row.id, $event)"
+                  />
+                </label>
+                }
+              </td>
+              @if (currentReport.status === "draft") {
+              <td>
+                <button
+                  class="text-button danger-text"
+                  type="button"
+                  [disabled]="element.rows.length <= 1"
+                  (click)="removeRow(element.id, row.id)"
+                >
+                  Remove row
+                </button>
+              </td>
+              }
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (currentReport.status === "draft") {
+      <footer class="table-footer">
+        <button
+          class="btn btn-secondary"
+          type="button"
+          (click)="addRow(element.id)"
+        >
+          Add row
+        </button>
+        <button
+          class="btn btn-secondary"
+          type="button"
+          (click)="addColumn(element.id)"
+        >
+          Add column
+        </button>
+      </footer>
+      }
+    </section>
+    } } }
+  </section>
+
+  @if (imageError()) {
+  <div class="image-load-error" role="alert">
+    <p>{{ imageError() }}</p>
+    <button class="btn btn-secondary" type="button" (click)="retryImageLoad()">
+      Retry image loading
+    </button>
+  </div>
+  }
+
+  <footer class="editor-actions">
+    @if (currentReport.status === "draft") {
+    <button
+      class="btn btn-secondary"
+      type="button"
+      [disabled]="isSaving()"
+      (click)="saveDraft()"
+    >
+      {{ isSaving() ? "Saving…" : "Save draft" }}
+    </button>
+    <button
+      class="btn btn-primary"
+      type="button"
+      [disabled]="isSaving()"
+      (click)="completeReport()"
+    >
+      Complete report
+    </button>
+    }
+    <button
+      class="btn btn-primary"
+      type="button"
+      [disabled]="isSaving() || isLoadingImages() || imageError() !== null"
+      (click)="saveAsPdf()"
+    >
+      {{ isLoadingImages() ? "Loading images…" : "Save as PDF" }}
+    </button>
+  </footer>
+</main>
+
+<article class="print-document">
+  <header class="print-header">
+    <div class="print-brand">
+      @if (printBrandingLogo(); as logo) {
+      <img [src]="logo" alt="" />
+      } @else {
+      <span>{{ brandingName() }}</span>
+      }
+    </div>
+    <p>Visual Quality Assessment</p>
+    <h1>{{ currentReport.title }}</h1>
+    <dl class="print-metadata">
+      <div>
+        <dt>Project / site</dt>
+        <dd>{{ currentReport.data.metadata.projectOrSite }}</dd>
+      </div>
+      <div>
+        <dt>Assessment date</dt>
+        <dd>{{ currentReport.data.metadata.assessmentDate }}</dd>
+      </div>
+      <div>
+        <dt>Assessor</dt>
+        <dd>{{ currentReport.data.metadata.assessor }}</dd>
+      </div>
+    </dl>
+    @if (currentReport.data.metadata.summary) {
+    <section>
+      <h2>Summary</h2>
+      <p class="print-summary">{{ currentReport.data.metadata.summary }}</p>
+    </section>
+    }
+  </header>
+
+  @for (element of currentReport.data.elements; track element.id) { @switch
+  (element.type) { @case ("paragraph") {
+  <section class="print-section print-paragraph" [id]="'entry-' + element.id">
+    <p>{{ element.text }}</p>
+  </section>
+  } @case ("table") {
+  <section class="print-section">
+    <h2>{{ element.title }}</h2>
+    <table>
+      <thead>
+        <tr>
+          @for (column of element.columns; track column.id) {
+          <th>{{ column.title }}</th>
+          }
+          <th>Images</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of element.rows; track row.id) {
+        <tr [id]="'entry-' + row.id">
+          @for (column of element.columns; track column.id) {
+          <td>{{ displayCellValue(cellValue(row, column.id), column) }}</td>
+          }
+          <td>
+            @for (image of attachmentsFor(row.id); track image.id) {
+            <a [attr.href]="'#appendix-' + image.id"
+              >Image {{ imageNumber(image.id) }}: {{ image.caption }}</a
+            >
+            }
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+  } @case ("image") {
+  <section
+    class="print-section print-image-element"
+    [id]="'entry-' + element.id"
+  >
+    @for (image of attachmentsFor(element.id); track image.id) {
+    <figure>
+      @if (previewFor(image.id); as preview) {
+      <img [src]="preview" [alt]="element.caption || image.caption" /> }
+      <figcaption>
+        {{ element.caption || image.caption }}
+        <a [attr.href]="'#appendix-' + image.id">See image appendix</a>
+      </figcaption>
+    </figure>
+    }
+  </section>
+  } } } @if (currentReport.attachments.length) {
+  <section class="print-appendix">
+    <h2>Image appendix</h2>
+    @for (image of currentReport.attachments; track image.id) {
+    <figure [id]="'appendix-' + image.id">
+      <figcaption>
+        <strong>Image {{ imageNumber(image.id) }}.</strong> {{ image.caption }}
+        <a [attr.href]="'#entry-' + image.entryId">Back to report entry</a>
+      </figcaption>
+      @if (previewFor(image.id); as preview) {
+      <img [src]="preview" [alt]="image.caption" /> }
+    </figure>
+    }
+  </section>
+  }
+</article>
+}

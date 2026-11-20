@@ -1,14 +1,48 @@
 <main class="report-library-page">
   <header class="page-heading">
+    <div class="report-brand">
+      @if (branding.logoFor(appearance.theme()); as logoPath) {
+      <img [src]="logoPath" [alt]="branding.brand()?.companyName" />
+      } @else {
+      <span>{{ branding.brand()?.companyName }}</span>
+      }
+    </div>
     <p class="eyebrow">Create a PDF report</p>
     <h1>Report templates</h1>
     <p class="subtitle">
-      Choose a template to start a report. Templates will be available here.
+      Assess architectural design quality against requirements and project
+      vision.
     </p>
   </header>
 
-  <section class="card empty-state" aria-labelledby="templates-empty-title">
-    <h2 id="templates-empty-title">No templates yet</h2>
-    <p>Report templates will appear here when they are added.</p>
+  @if (errorMessage()) {
+  <p class="error-text" role="alert">{{ errorMessage() }}</p>
+  }
+
+  <section class="card template-card" aria-labelledby="vqa-template-title">
+    <div class="template-card-heading">
+      <div>
+        <p class="eyebrow">Architecture</p>
+        <h2 id="vqa-template-title">Visual Quality Assessment (VQA)</h2>
+      </div>
+      <span class="template-format">PDF report</span>
+    </div>
+    <p>
+      Build an assessment from reusable tables with typed columns, flexible
+      rows, comments, and captioned images linked to report entries.
+    </p>
+    <ul class="template-features">
+      <li>Create, resize, and duplicate tables</li>
+      <li>Text, number, date, yes/no, and rating columns</li>
+      <li>Linked image appendix in the exported report</li>
+    </ul>
+    <button
+      class="btn btn-primary"
+      type="button"
+      [disabled]="isStarting()"
+      (click)="startVqaReport()"
+    >
+      {{ isStarting() ? "Starting…" : "Start VQA report" }}
+    </button>
   </section>
 </main>

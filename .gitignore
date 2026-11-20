@@ -18,6 +18,8 @@
 # Environment files
 /.env
 /frontend/.env
+/frontend/instance-brand.json
+/frontend/instance-assets/
 
 # Angular CLI and build artefacts
 /.angular-cli.json

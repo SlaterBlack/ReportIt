@@ -151,3 +151,27 @@ h2 {
   white-space: nowrap;
   clip-path: inset(50%);
 }
+
+@media print {
+  html.report-printing,
+  html.report-printing body {
+    min-width: 0;
+    min-height: 0;
+    background: #fff;
+  }
+
+  html.report-printing body * {
+    visibility: hidden !important;
+  }
+
+  html.report-printing body app-vqa-editor,
+  html.report-printing body app-vqa-editor * {
+    visibility: visible !important;
+  }
+
+  html.report-printing body app-vqa-editor {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+  }
+}

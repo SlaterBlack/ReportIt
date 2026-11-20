@@ -27,6 +27,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import("./features/reports/my-reports").then((m) => m.MyReports),
       },
+      {
+        path: "reports/:reportId",
+        loadComponent: () =>
+          import("./features/reports/vqa-editor").then((m) => m.VqaEditor),
+      },
       { path: "profile", component: Profile },
       {
         path: "users",

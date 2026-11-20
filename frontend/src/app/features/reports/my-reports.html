@@ -7,8 +7,40 @@
     </p>
   </header>
 
+  @if (isLoading()) {
+  <p class="report-loading" role="status">Loading your reports…</p>
+  } @else if (errorMessage()) {
+  <div role="alert">
+    <p class="error-text">{{ errorMessage() }}</p>
+    <button class="btn btn-secondary" type="button" (click)="loadReports()">
+      Try again
+    </button>
+  </div>
+  } @else if (reports().length === 0) {
   <section class="card empty-state" aria-labelledby="reports-empty-title">
     <h2 id="reports-empty-title">No reports yet</h2>
-    <p>Reports you start or complete will appear here.</p>
+    <p>Start a VQA report from Report templates to see it here.</p>
   </section>
+  } @else {
+  <section class="report-list" aria-label="Your reports">
+    @for (report of reports(); track report.id) {
+    <a class="card report-card" [routerLink]="['/reports', report.id]">
+      <span class="report-card-main">
+        <strong>{{ report.title }}</strong>
+        <small>
+          VQA · Updated {{ formatDate(report.updatedAt) }} · {{
+          report.attachments.length }} image{{ report.attachments.length === 1 ?
+          "" : "s" }}
+        </small>
+      </span>
+      <span
+        class="report-status"
+        [class.report-status-completed]="report.status === 'completed'"
+      >
+        {{ report.status === "completed" ? "Completed" : "Draft" }}
+      </span>
+    </a>
+    }
+  </section>
+  }
 </main>

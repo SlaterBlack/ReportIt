@@ -14,6 +14,23 @@
   }
 }
 
+.report-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  color: var(--color-primary-dark);
+  font-size: 1.1rem;
+  font-weight: 700;
+
+  img {
+    display: block;
+    max-width: 180px;
+    max-height: 48px;
+    object-fit: contain;
+  }
+}
+
 .eyebrow {
   margin: 0;
   color: var(--color-accent);
@@ -41,5 +58,105 @@
   p {
     margin: 0;
     color: var(--color-text-muted);
+  }
+}
+
+.template-card {
+  max-width: 860px;
+
+  > p {
+    color: var(--color-text-muted);
+  }
+}
+
+.template-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+
+  h2 {
+    margin: 5px 0 0;
+    color: var(--color-primary-dark);
+    font-size: 1.2rem;
+  }
+
+  .eyebrow {
+    margin: 0;
+  }
+}
+
+.template-format,
+.report-status {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.template-features {
+  display: grid;
+  gap: var(--space-xs);
+  margin: var(--space-md) 0 var(--space-lg);
+  padding-left: 1.25rem;
+  color: var(--color-text);
+}
+
+.error-text {
+  color: var(--color-danger);
+}
+
+.report-list {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.report-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  color: var(--color-text);
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--color-accent);
+  }
+}
+
+.report-card-main {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: var(--space-xs);
+
+  strong {
+    overflow: hidden;
+    color: var(--color-primary-dark);
+    text-overflow: ellipsis;
+  }
+
+  small {
+    color: var(--color-text-muted);
+  }
+}
+
+.report-status-completed {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.report-loading,
+.report-empty {
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 600px) {
+  .report-card {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
